@@ -32,20 +32,17 @@ void setupWiFi() {
 	WiFi.enableLongRange(wifiLongRange);
 
 	if (wifiMode == W_AP) {
-		WiFi.setTxPower(WIFI_POWER_8_5dBm); // Before activating the AP
 		WiFi.softAP(storage.getString("WIFI_AP_SSID", "flix").c_str(), storage.getString("WIFI_AP_PASS", "flixwifi").c_str());
 		udp.begin(udpLocalPort);
 	}
 
 	if (wifiMode == W_STA) {
 		WiFi.begin(storage.getString("WIFI_STA_SSID", "").c_str(), storage.getString("WIFI_STA_PASS", "").c_str());
-		WiFi.setTxPower(WIFI_POWER_8_5dBm); // After Wifi.begin
 		udp.begin(udpLocalPort);
 	}
 
 	if (wifiMode == W_ESPNOW) {
 		WiFi.mode(WIFI_AP);
-		WiFi.setTxPower(WIFI_POWER_8_5dBm); // Before activating the AP
 		WiFi.setChannel(espnowChannel);
 		espnow.addr(MacAddress(storage.getString("ESPNOW_PEER_MAC", "FF:FF:FF:FF:FF:FF").c_str()));
 		String key = storage.getString("ESPNOW_PEER_KEY", "");
@@ -54,8 +51,11 @@ void setupWiFi() {
 		espnowBroadcast.begin();
 	}
 
-	Serial.print("Current TX Power: ");
-	Serial.println(WiFi.getTxPower());
+	if (wifiMode != W_DISABLED) {
+		WiFi.setTxPower(WIFI_POWER_8_5dBm); 
+		Serial.print("WiFi Current TX Power: "); // Expect: 34 = 8.5 * 4
+		Serial.println(WiFi.getTxPower());
+	}
 
 	WiFi.setSleep(false); // disable power save
 }
