@@ -7,12 +7,16 @@
 
 float motors[4]; // normalized motor thrusts in range [0..1]
 
-int motorPins[4] = {-1, -1, -1, -1}; // default pin numbers
-int pwmFrequency = 78000;
-int pwmResolution = 10;
-int pwmStop = 0;
-int pwmMin = 0;
-int pwmMax = -1; // -1 means duty cycle mode
+static constexpr int motorPins[4] = {5, 4, 3, 1}; // default pin numbers
+// Not documented but this is in Hz so the period is 20ms or 20000 usec.
+static  int pwmFrequency = 50;
+static constexpr int pwmResolution = 10;
+// Not documented but pwm* are measured in microseconds.
+// For brushless motor ESC, the control pulse are 1ms to 2ms (or 1000 microseconds to 2000 microseconds).
+// We keep pwmStop = 0 to OFF the entire control signal (disarm the motor) instead of keeping it at 1ms duty.
+static constexpr int pwmStop = 0;
+static constexpr int pwmMin = 1000;
+static constexpr int pwmMax = 2000; // -1 means duty cycle mode
 
 const int MOT_RL = 0, MOT_RR = 1, MOT_FR = 2, MOT_FL = 3;
 
