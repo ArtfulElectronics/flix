@@ -11,10 +11,10 @@
 #include "util.h"
 
 IMU *imu;
-int imuModel = -1; // 1 - MPU9250, 2 - ICM20948, 3 - MPU6050, 4 - ICM40609D
-int imuBus = 0; // 0 - SPI, 1 - I2C
-int imuSckPin = SCK, imuMisoPin = MISO, imuMosiPin = MOSI, imuCsPin = SS, imuIntPin = -1;
-int imuSdaPin = SDA, imuSclPin = SCL;
+static constexpr int imuModel = 1; // 1 - MPU9250, 2 - ICM20948, 3 - MPU6050, 4 - ICM40609D
+static constexpr int imuBus = 0; // 0 - SPI, 1 - I2C
+static constexpr int imuSckPin = 9, imuMisoPin = 2, imuMosiPin = 8, imuCsPin = 10, imuIntPin = -1;
+static constexpr int imuSdaPin = 8, imuSclPin = 9;
 Vector imuRotation(0, 0, PI / 2); // imu orientation as Euler angles
 
 Vector gyro; // gyroscope output, rad/s
@@ -29,7 +29,7 @@ LowPassFilter<Vector> gyroBiasFilter(0.001);
 void setupIMU() {
 	print("Setup IMU\n");
 	free(imu);
-	if (imuModel == 3) imuBus = 1; // MPU6050 is I2C only
+	// if (imuModel == 3) imuBus = 1; // MPU6050 is I2C only
 
 	if (imuBus == 0) {
 		// SPI connection
