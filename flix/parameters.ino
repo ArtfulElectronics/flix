@@ -9,7 +9,7 @@
 extern int channelZero[16], channelMax[16];
 extern int rollChannel, pitchChannel, throttleChannel, yawChannel, armedChannel, modeChannel;
 extern int rcRxPin, voltagePin;
-extern int wifiMode, wifiLongRange, wifiBroadcast, udpLocalPort, udpRemotePort, espnowChannel;
+// extern int wifiMode, wifiLongRange, wifiBroadcast, udpLocalPort, udpRemotePort, espnowChannel;
 extern float rcLossTimeout, descendTime, disarmTilt;
 extern float voltageScale;
 extern LowPassFilter<float> voltageFilter;
@@ -93,36 +93,36 @@ Parameter parameters[] = {
 	// {"MOT_PWM_MIN", &pwmMin},
 	// {"MOT_PWM_MAX", &pwmMax},
 	// rc
-	{"RC_RX_PIN", &rcRxPin, setupRC},
-	{"RC_ZERO_0", &channelZero[0]},
-	{"RC_ZERO_1", &channelZero[1]},
-	{"RC_ZERO_2", &channelZero[2]},
-	{"RC_ZERO_3", &channelZero[3]},
-	{"RC_ZERO_4", &channelZero[4]},
-	{"RC_ZERO_5", &channelZero[5]},
-	{"RC_ZERO_6", &channelZero[6]},
-	{"RC_ZERO_7", &channelZero[7]},
-	{"RC_MAX_0", &channelMax[0]},
-	{"RC_MAX_1", &channelMax[1]},
-	{"RC_MAX_2", &channelMax[2]},
-	{"RC_MAX_3", &channelMax[3]},
-	{"RC_MAX_4", &channelMax[4]},
-	{"RC_MAX_5", &channelMax[5]},
-	{"RC_MAX_6", &channelMax[6]},
-	{"RC_MAX_7", &channelMax[7]},
-	{"RC_ROLL", &rollChannel},
-	{"RC_PITCH", &pitchChannel},
-	{"RC_THROTTLE", &throttleChannel},
-	{"RC_YAW", &yawChannel},
-	{"RC_MODE", &modeChannel},
+	// {"RC_RX_PIN", &rcRxPin, setupRC},
+	// {"RC_ZERO_0", &channelZero[0]},
+	// {"RC_ZERO_1", &channelZero[1]},
+	// {"RC_ZERO_2", &channelZero[2]},
+	// {"RC_ZERO_3", &channelZero[3]},
+	// {"RC_ZERO_4", &channelZero[4]},
+	// {"RC_ZERO_5", &channelZero[5]},
+	// {"RC_ZERO_6", &channelZero[6]},
+	// {"RC_ZERO_7", &channelZero[7]},
+	// {"RC_MAX_0", &channelMax[0]},
+	// {"RC_MAX_1", &channelMax[1]},
+	// {"RC_MAX_2", &channelMax[2]},
+	// {"RC_MAX_3", &channelMax[3]},
+	// {"RC_MAX_4", &channelMax[4]},
+	// {"RC_MAX_5", &channelMax[5]},
+	// {"RC_MAX_6", &channelMax[6]},
+	// {"RC_MAX_7", &channelMax[7]},
+	// {"RC_ROLL", &rollChannel},
+	// {"RC_PITCH", &pitchChannel},
+	// {"RC_THROTTLE", &throttleChannel},
+	// {"RC_YAW", &yawChannel},
+	// {"RC_MODE", &modeChannel},
 	// wifi
-	{"WIFI_MODE", &wifiMode},
-	{"WIFI_PORT_LOC", &udpLocalPort},
-	{"WIFI_PORT_REM", &udpRemotePort},
-	{"WIFI_LONG_RANGE", &wifiLongRange},
-	{"WIFI_BROADCAST", &wifiBroadcast},
+	// {"WIFI_MODE", &wifiMode},
+	// {"WIFI_PORT_LOC", &udpLocalPort},
+	// {"WIFI_PORT_REM", &udpRemotePort},
+	// {"WIFI_LONG_RANGE", &wifiLongRange},
+	// {"WIFI_BROADCAST", &wifiBroadcast},
 	// espnow
-	{"ESPNOW_CHANNEL", &espnowChannel},
+	// {"ESPNOW_CHANNEL", &espnowChannel},
 	// mavlink
 	{"MAV_SYS_ID", &mavlinkSysId},
 	{"MAV_RATE_SLOW", &telemetrySlow.rate},

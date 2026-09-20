@@ -156,16 +156,16 @@ void doCommand(String str, bool echo = false) {
 		print("armed: %d\n", armed);
 	} else if (command == "pw") {
 		print("Voltage: %.1f V\n", voltage);
-	} else if (command == "wifi" && arg0 == "") {
-		printWiFiInfo();
-	} else if (command == "wifi") {
-		setWiFiMode(arg0);
-	} else if (command == "ap") {
-		configWiFi(W_AP, arg0.c_str(), arg1.c_str());
-	} else if (command == "sta") {
-		configWiFi(W_STA, arg0.c_str(), arg1.c_str());
-	} else if (command == "espnow") {
-		configWiFi(W_ESPNOW, arg0.c_str(), arg1.c_str());
+	// } else if (command == "wifi" && arg0 == "") {
+	// 	printWiFiInfo();
+	// } else if (command == "wifi") {
+	// 	setWiFiMode(arg0);
+	// } else if (command == "ap") {
+	// 	configWiFi(W_AP, arg0.c_str(), arg1.c_str());
+	// } else if (command == "sta") {
+	// 	configWiFi(W_STA, arg0.c_str(), arg1.c_str());
+	// } else if (command == "espnow") {
+	// 	configWiFi(W_ESPNOW, arg0.c_str(), arg1.c_str());
 	} else if (command == "mot") {
 		print("front-right %g front-left %g rear-right %g rear-left %g\n",
 			motors[MOT_FR], motors[MOT_FL], motors[MOT_RR], motors[MOT_RL]);

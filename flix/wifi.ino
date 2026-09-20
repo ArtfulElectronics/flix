@@ -3,44 +3,60 @@
 
 // Wi-Fi and ESP-NOW communication
 
+#define SUPPORT_ESP_NOW 0
+#define SUPPORT_WIFI_LR 0
+#define SUPPORT_WIFI_ST 0
+
 #include <WiFi.h>
 #include <WiFiAP.h>
 #include <WiFiUdp.h>
 #include <MacAddress.h>
+#if SUPPORT_ESP_NOW
 #include <ESP32_NOW_Serial.h>
+#endif
 #include <Preferences.h>
 #include "util.h"
 
 extern Preferences storage; // use the main preferences storage
 
 const int W_DISABLED = 0, W_AP = 1, W_STA = 2, W_ESPNOW = 3;
-int wifiMode = W_AP;
+static constexpr int wifiMode = W_AP;
 
+#if SUPPORT_WIFI_LR
 int wifiLongRange = 0;
-int wifiBroadcast = 0; // 0 - broadcast until connected, 1 - always broadcast
-int udpLocalPort = 14550;
-int udpRemotePort = 14550;
+#endif
+
+static constexpr int wifiBroadcast = 0; // 0 - broadcast until connected, 1 - always broadcast
+static constexpr int udpLocalPort = 14550;
+static constexpr int udpRemotePort = 14550;
 IPAddress udpRemoteIP = "255.255.255.255";
 WiFiUDP udp;
 
+#if SUPPORT_ESP_NOW
 ESPNOWSerial espnow(NULL, 0, WIFI_IF_AP);
 ESPNOWSerial espnowBroadcast(ESP_NOW.BROADCAST_ADDR, 0, WIFI_IF_AP);
 int espnowChannel = 6;
+#endif
 
 void setupWiFi() {
 	print("Setup Wi-Fi\n");
+#if SUPPORT_WIFI_LR
 	WiFi.enableLongRange(wifiLongRange);
+#endif
 
 	if (wifiMode == W_AP) {
 		WiFi.softAP(storage.getString("WIFI_AP_SSID", "flix").c_str(), storage.getString("WIFI_AP_PASS", "flixwifi").c_str());
 		udp.begin(udpLocalPort);
 	}
 
+#if SUPPORT_WIFI_ST
 	if (wifiMode == W_STA) {
 		WiFi.begin(storage.getString("WIFI_STA_SSID", "").c_str(), storage.getString("WIFI_STA_PASS", "").c_str());
 		udp.begin(udpLocalPort);
 	}
+#endif
 
+#if SUPPORT_ESP_NOW
 	if (wifiMode == W_ESPNOW) {
 		WiFi.mode(WIFI_AP);
 		WiFi.setChannel(espnowChannel);
@@ -50,6 +66,7 @@ void setupWiFi() {
 		espnow.begin();
 		espnowBroadcast.begin();
 	}
+#endif
 
 	if (wifiMode != W_DISABLED) {
 		WiFi.setTxPower(WIFI_POWER_8_5dBm); 
@@ -61,6 +78,7 @@ void setupWiFi() {
 }
 
 void sendWiFi(const uint8_t *buf, int len) {
+#if SUPPORT_ESP_NOW
 	if (espnow) {
 		espnow.write(buf, len);
 
@@ -68,6 +86,7 @@ void sendWiFi(const uint8_t *buf, int len) {
 		if (espnow.isEncrypted() && discovery) espnowBroadcast.write((const uint8_t *)"flix", 4); // broadcast message to help finding this device
 		return;
 	}
+#endif
 
 	if (WiFi.softAPgetStationNum() == 0 && !WiFi.isConnected()) return;
 
@@ -78,9 +97,11 @@ void sendWiFi(const uint8_t *buf, int len) {
 }
 
 int receiveWiFi(uint8_t *buf, int len) {
+#if SUPPORT_ESP_NOW
 	if (espnow) {
 		return espnow.read(buf, len);
 	}
+#endif
 
 	if (WiFi.softAPgetStationNum() == 0 && !WiFi.isConnected()) return 0;
 
@@ -88,6 +109,8 @@ int receiveWiFi(uint8_t *buf, int len) {
 	if (udp.remoteIP()) udpRemoteIP = udp.remoteIP();
 	return udp.read(buf, len);
 }
+
+#if 0
 
 void printWiFiInfo() {
 	if (espnow) {
@@ -158,3 +181,5 @@ void setWiFiMode(const String& mode) {
 	static const char *modes[] = {"Disabled", "Access Point (AP)", "Client (STA)", "ESP-NOW"};
 	print("✓ Wi-Fi mode set to %s, reboot to apply\n", modes[wifiMode]);
 }
+
+#endif
