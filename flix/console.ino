@@ -19,7 +19,7 @@ extern bool armed;
 extern LowPassFilter<Vector> gyroBiasFilter;
 extern float voltage;
 extern bool throttleUpdated;
-extern float pwm[4];
+extern float pwm[4], duty[4];
 
 const char* motd =
 " _______  __       __  ___   ___\n"
@@ -54,7 +54,7 @@ const char* motd =
 "mot - show motor output\n"
 "log [dump] - print log header [and data]\n"
 "mfr/mfl/mrr/mrl [<thrust>] - test motor (remove props)\n"
-"mall [<thrust>] - send thrust to all motor (for ESC calibration)\n"
+"esc [<thrust>] - send thrust to all motor (for ESC calibration)\n"
 "sys - show system info\n"
 "reset - reset drone's state\n"
 "reboot - reboot the drone\n";
@@ -147,8 +147,6 @@ void doCommand(String str, bool echo = false) {
 		mode = ACRO;
 	} else if (command == "auto") {
 		mode = AUTO;
-	} else if (command == "direct") {
-		mode = ESC_DIRECT;
 	} else if (command == "rc") {
 		print("channels: ");
 		for (int i = 0; i < 16; i++) {
@@ -176,6 +174,8 @@ void doCommand(String str, bool echo = false) {
 			motors[MOT_FR], motors[MOT_FL], motors[MOT_RR], motors[MOT_RL]);
 		print("PWM: front-right %g front-left %g rear-right %g rear-left %g\n",
 			pwm[MOT_FR], pwm[MOT_FL], pwm[MOT_RR], pwm[MOT_RL]);
+		print("Duty: front-right %g front-left %g rear-right %g rear-left %g\n",
+			duty[MOT_FR], duty[MOT_FL], duty[MOT_RR], duty[MOT_RL]);
 	} else if (command == "log") {
 		printLogHeader();
 		if (arg0 == "dump") printLogData();
@@ -191,13 +191,8 @@ void doCommand(String str, bool echo = false) {
 		testMotor(MOT_RR, arg0.isEmpty() ? 0.2 : arg0.toFloat());
 	} else if (command == "mrl") {
 		testMotor(MOT_RL, arg0.isEmpty() ? 0.2 : arg0.toFloat());
-	} else if (command == "escmin") {
-		controlThrottle = 0.0;
-		throttleUpdated = true;
-	} else if (command == "escmax") {
-		controlThrottle = 1.0;
-		throttleUpdated = true;
 	} else if (command == "esc") {
+		mode = ESC_DIRECT;
 		controlThrottle = arg0.toFloat();
 		throttleUpdated = true;
 	} else if (command == "sys") {

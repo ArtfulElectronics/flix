@@ -3,12 +3,17 @@
 
 // PWM control for motors
 
+#define USE_SERVO_LIB 0
+
 #include <ESP32Servo.h>
 #include "util.h"
 
 float motors[4] = { 0.0f, 0.0f, 0.0f, 0.0f }; // normalized motor thrusts in range [0..1]
-float pwm[4];
+float pwm[4], duty[4]; // for printing to the console for troubleshooting purpose
+
+#if USE_SERVO_LIB
 Servo myESC[4];
+#endif
 
 static constexpr int motorPins[4] = {5, 4, 3, 1}; // default pin numbers
 // Not documented but this is in Hz so the period is 20ms or 20000 usec.
@@ -26,30 +31,40 @@ const int MOT_RL = 0, MOT_RR = 1, MOT_FR = 2, MOT_FL = 3;
 void setupMotors() {
 	print("Setup motors\n");
 
+#if USE_SERVO_LIB
 	ESP32PWM::allocateTimer(0);
 	ESP32PWM::allocateTimer(1);
 	ESP32PWM::allocateTimer(2);
 	ESP32PWM::allocateTimer(3);
+#endif
 
 	// Configure pins
 	for (int i = 0; i < 4; i++) {
-		// if (motorPins[i] < 0) continue; // skip unassigned motors
-		// ledcAttach(motorPins[i], pwmFrequency, pwmResolution);
-		// pwmFrequency = ledcChangeFrequency(motorPins[i], pwmFrequency, pwmResolution); // when reconfiguring
-	  myESC[i].setPeriodHertz(50);      // Standard 50Hz frequency for servos/ESCs
-    myESC[i].attach(motorPins[i], 1000, 2000); // Attach pin with min/max pulse width in microseconds
+#if USE_SERVO_LIB
+		myESC[i].setPeriodHertz(50);      // Standard 50Hz frequency for servos/ESCs
+		myESC[i].attach(motorPins[i], 1000, 2000); // Attach pin with min/max pulse width in microseconds
+#else
+		if (motorPins[i] < 0) continue; // skip unassigned motors
+		ledcAttach(motorPins[i], pwmFrequency, pwmResolution);
+		pwmFrequency = ledcChangeFrequency(motorPins[i], pwmFrequency, pwmResolution); // when reconfiguring
+#endif
 	}
 	sendMotors();
 }
 
 void sendMotors() {
 	for (int i = 0; i < 4; i++) {
-		// if (motorPins[i] < 0) continue; // skip unassigned motors
-		// ledcWrite(motorPins[i], getDutyCycle(motors[i]));
-		float t = motors[i];
-		t = constrain(t, 0, 1);
-		pwm[i] = mapf(t, 0, 1, pwmMin, pwmMax);
+		if (motorPins[i] < 0) continue; // skip unassigned motors
+
+		float thrust = constrain(motors[i], 0, 1);
+		pwm[i] = mapf(thrust, 0, 1, pwmMin, pwmMax);
+
+#if USE_SERVO_LIB
 		myESC[i].writeMicroseconds(pwm[i]);
+#else
+		duty[i] = mapf(pwm[i], 0, 1000000 / pwmFrequency, 0, (1 << pwmResolution) - 1);
+		ledcWrite(motorPins[i], /* getDutyCycle(motors[i]) */ duty[i]);
+#endif
 	}
 }
 
