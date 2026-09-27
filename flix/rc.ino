@@ -7,7 +7,7 @@
 #include "util.h"
 
 SBUS rc(Serial1);
-int rcRxPin = -1; // -1 means disabled
+constexpr int rcRxPin = -1; // -1 means disabled
 
 uint16_t channels[16]; // raw rc channels
 int channelZero[16]; // calibration zero values

@@ -9,7 +9,7 @@
 #include "filter.h"
 #include "util.h"
 
-const int RAW = 0, ACRO = 1, STAB = 2, AUTO = 3; // flight modes
+const int RAW = 0, ACRO = 1, STAB = 2, AUTO = 3, ESC_DIRECT = 4; // flight modes
 int mode = STAB;
 bool armed = false;
 
@@ -31,8 +31,20 @@ int flightModes[] = {STAB, STAB, STAB}; // map for rc mode switch
 
 extern const int MOT_RL, MOT_RR, MOT_FR, MOT_FL;
 extern float controlRoll, controlPitch, controlThrottle, controlYaw, controlMode;
+bool throttleUpdated = false;
 
 void control() {
+	if (mode == ESC_DIRECT) {
+		if (throttleUpdated) {
+			motors[MOT_FL] = controlThrottle;
+			motors[MOT_FR] = controlThrottle;
+			motors[MOT_RL] = controlThrottle;
+			motors[MOT_RR] = controlThrottle;
+			throttleUpdated = false;
+		}
+		return;
+	}
+
 	interpretControls();
 	failsafe();
 	controlAttitude();
@@ -151,6 +163,7 @@ const char* getModeName() {
 		case ACRO: return "ACRO";
 		case STAB: return "STAB";
 		case AUTO: return "AUTO";
+		case ESC_DIRECT: return "ESC_DIRECT";
 		default: return "UNKNOWN";
 	}
 }

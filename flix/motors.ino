@@ -3,18 +3,21 @@
 
 // PWM control for motors
 
+#include <ESP32Servo.h>
 #include "util.h"
 
-float motors[4]; // normalized motor thrusts in range [0..1]
+float motors[4] = { 0.0f, 0.0f, 0.0f, 0.0f }; // normalized motor thrusts in range [0..1]
+float pwm[4];
+Servo myESC[4];
 
 static constexpr int motorPins[4] = {5, 4, 3, 1}; // default pin numbers
 // Not documented but this is in Hz so the period is 20ms or 20000 usec.
-static  int pwmFrequency = 50;
+static int pwmFrequency = 50;
 static constexpr int pwmResolution = 10;
 // Not documented but pwm* are measured in microseconds.
 // For brushless motor ESC, the control pulse are 1ms to 2ms (or 1000 microseconds to 2000 microseconds).
 // We keep pwmStop = 0 to OFF the entire control signal (disarm the motor) instead of keeping it at 1ms duty.
-static constexpr int pwmStop = 0;
+static constexpr int pwmStop = 1000;
 static constexpr int pwmMin = 1000;
 static constexpr int pwmMax = 2000; // -1 means duty cycle mode
 
@@ -22,19 +25,31 @@ const int MOT_RL = 0, MOT_RR = 1, MOT_FR = 2, MOT_FL = 3;
 
 void setupMotors() {
 	print("Setup motors\n");
+
+	ESP32PWM::allocateTimer(0);
+	ESP32PWM::allocateTimer(1);
+	ESP32PWM::allocateTimer(2);
+	ESP32PWM::allocateTimer(3);
+
 	// Configure pins
 	for (int i = 0; i < 4; i++) {
-		if (motorPins[i] < 0) continue; // skip unassigned motors
-		ledcAttach(motorPins[i], pwmFrequency, pwmResolution);
-		pwmFrequency = ledcChangeFrequency(motorPins[i], pwmFrequency, pwmResolution); // when reconfiguring
+		// if (motorPins[i] < 0) continue; // skip unassigned motors
+		// ledcAttach(motorPins[i], pwmFrequency, pwmResolution);
+		// pwmFrequency = ledcChangeFrequency(motorPins[i], pwmFrequency, pwmResolution); // when reconfiguring
+	  myESC[i].setPeriodHertz(50);      // Standard 50Hz frequency for servos/ESCs
+    myESC[i].attach(motorPins[i], 1000, 2000); // Attach pin with min/max pulse width in microseconds
 	}
 	sendMotors();
 }
 
 void sendMotors() {
 	for (int i = 0; i < 4; i++) {
-		if (motorPins[i] < 0) continue; // skip unassigned motors
-		ledcWrite(motorPins[i], getDutyCycle(motors[i]));
+		// if (motorPins[i] < 0) continue; // skip unassigned motors
+		// ledcWrite(motorPins[i], getDutyCycle(motors[i]));
+		float t = motors[i];
+		t = constrain(t, 0, 1);
+		pwm[i] = mapf(t, 0, 1, pwmMin, pwmMax);
+		myESC[i].writeMicroseconds(pwm[i]);
 	}
 }
 
