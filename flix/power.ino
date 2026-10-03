@@ -10,8 +10,12 @@
 
 float voltage = NAN;
 LowPassFilter<float> voltageFilter(1);
-int voltagePin = -1;
-float voltageScale = 2;
+int voltagePin = 0;
+// Use a RV : RG voltage divider to get maximum 2S LiPo battery voltage (8.4V) into readable range.
+// Ideally, RV : RG = 10K : 5K then [0, 8.4V] becomes [0, 2.8V].
+const float RV = 10; // Resistor connecting to +BATT (k Ohm)
+const float RG =  5; // Resistor connecting to GND (k Ohm)
+float voltageScale = (RV + RG) / RG;
 
 void setupPower() {
 	REG_CLR_BIT(RTC_CNTL_BROWN_OUT_REG, RTC_CNTL_BROWN_OUT_ENA); // disable reset on low voltage

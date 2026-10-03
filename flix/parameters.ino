@@ -8,7 +8,7 @@
 
 extern int channelZero[16], channelMax[16];
 extern int rollChannel, pitchChannel, throttleChannel, yawChannel, armedChannel, modeChannel;
-extern int /* rcRxPin, */ voltagePin;
+// extern int rcRxPin, voltagePin;
 // extern int wifiMode, wifiLongRange, wifiBroadcast, udpLocalPort, udpRemotePort, espnowChannel;
 extern float rcLossTimeout, descendTime, disarmTilt;
 extern float voltageScale;
@@ -131,7 +131,7 @@ Parameter parameters[] = {
 	{"MAV_RATE_MOT", &telemetryMotors.rate},
 	{"MAV_RATE_IMU", &telemetryIMU.rate},
 	// power
-	{"PWR_VOLT_PIN", &voltagePin, setupPower},
+	// {"PWR_VOLT_PIN", &voltagePin, setupPower},
 	{"PWR_VOLT_SCALE", &voltageScale},
 	{"PWR_VOLT_LPF_A", &voltageFilter.alpha},
 	// safety
